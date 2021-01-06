@@ -24,7 +24,8 @@ It's not necessary to have this gracefully decay into the rfc behavior ( ie. so 
 
 ## Sample Patch
 
-Here's a sample migration file. ( Doesn't really count as a full example without before and after data i guess. )
+Here's a sample(*) migration file. Each command can alter multiple nodes.
+
 ```javascript
 [{
   "patch": "replace",
@@ -65,7 +66,7 @@ Here's a sample migration file. ( Doesn't really count as a full example without
 }},
 {
   "patch": "replace",
-  "reason": "renames all list_push commands to push_edge",
+  "reason": "renames all list_push commands to put_edge",
   "migration": {
     "from": {
       "parent": "$..[?(@.type=='list_push')]",
@@ -74,3 +75,5 @@ Here's a sample migration file. ( Doesn't really count as a full example without
     "with": "put_edge"
 }}]
 ```
+
+(*) _Doesn't really count as a full example without before and after data i guess._
