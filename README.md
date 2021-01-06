@@ -25,7 +25,7 @@ It's not necessary to have this gracefully decay into the rfc behavior ( ie. so 
 ## Sample Patch
 
 Here's a sample migration file. ( Doesn't really count as a full example without before and after data i guess. )
-```
+```javascript
 [{
   "patch": "replace",
   "reason": "restructure/rename 'list' to 'into'. this adds the 'into'(s), we'll then copy bits of 'list' and remove it.",
