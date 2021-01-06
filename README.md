@@ -10,17 +10,17 @@ There's no perfect standard for JSON Paths. This uses [PaesslerAG's](https://git
 
 ## Status
 
-Currently only "replace" and "copy" are supported. Array support hasn't been verified. A hierarchical select is still needed to apply commands to sub-blocks. Proper patch error handling hasn't been evaluted.
+Currently only "replace" and "copy" are supported. Array support hasn't been verified. A hierarchical select is still needed to apply commands to sub-blocks. Proper patch error handling hasn't been evaluted. And because paths can affect multiple values, the simplest way to work with them has been to require a pair of values: a `parent path` targeting one or more json objects, plus a `field` targeting a specific member of each matching object. 
 
 As to other JSON Patch verbs: 
 * "add" is basically a replace ( plus or minus some array, error handling jazz );
 * "remove" is supported with a `null` replace value;
-* "replace" is replace;
+* "replace" is basically replace;
 * "move" can be implemented with a copy and replace null;
-* "copy" is copy;
+* "copy" is basically copy;
 * "test" will be supported via select.
 
-It's not necessary to have this gracefully decay into the rfc behavior ( ie. so that it can directly support json patch documents ) but that would be cool. ( ex. transform json pointers starting with "/" into their "$" path equivalents; directly support all verbs; correctly handle errors. )
+It's not necessary to have this gracefully decay into the rfc behavior ( ie. so that it can directly support json patch documents ) but that would be cool. ( ex. replace the pair of (parent path, child field) with a single string value; transform json pointers starting with "/" into their "$" path equivalents; directly support all verbs; correctly handle errors. )
 
 ## Sample Patch
 
