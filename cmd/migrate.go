@@ -15,16 +15,14 @@ import (
 
 func main() {
 	// fix: remove
-	paths := "/Users/ionous/Dev/go/src/github.com/ionous/iffy/stories"
-	patchPath := "/Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/migrate/push.patch.js"
-
+	var paths, patchPath string
 	// fix: default to using stdin, stdout.
 	flag.StringVar(&paths, "in", paths, "comma separated input files or directory names")
 	flag.StringVar(&patchPath, "patch", patchPath, "patch file")
 	flag.BoolVar(&errutil.Panic, "panic", false, "panic on error?")
 	flag.Parse()
 	//
-	var patch jp.Patch
+	var patch jp.Patches
 	if e := readJson(patchPath, &patch); e != nil {
 		panic(e)
 	} else if e := migratePaths(paths, patch); e != nil {
@@ -36,17 +34,18 @@ func migratePaths(paths string, patch jp.Migration) (err error) {
 	return readPaths(paths, func(path string, doc interface{}) (err error) {
 		log.Printf("migrating %q...", path)
 		if cnt, e := patch.Migrate(doc); e != nil {
-			err = e
+			err = errutil.Fmt("migration of %q failed because %v", path, e)
 		} else if cnt == 0 {
 			log.Println("unchanged.")
+		} else if f, e := os.Create(path); e != nil {
+			err = errutil.New("couldnt write to", path)
 		} else {
-			if f, e := os.Create(path); e != nil {
-				err = e
+			defer f.Close()
+			js := json.NewEncoder(f)
+			js.SetIndent("", "  ")
+			if e := js.Encode(doc); e != nil {
+				err = errutil.New("couldnt encode output", e)
 			} else {
-				defer f.Close()
-				js := json.NewEncoder(f)
-				js.SetIndent("", "  ")
-				err = js.Encode(doc)
 				log.Println("migrated.")
 			}
 		}

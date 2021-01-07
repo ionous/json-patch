@@ -1,33 +1,30 @@
 package jsonpatch
 
 import (
-	"github.com/PaesslerAG/jsonpath"
+	"encoding/json"
+
 	"github.com/ionous/errutil"
 )
 
 // ReplaceValues (or add) the 'field' of any objects targeted by the 'parent' path with the passed 'value'.
-// If value is nil, delete the field instead.
 // ( This is normally used via patch commands. )
-func ReplaceValues(doc interface{}, parent, field string, value interface{}) (ret int, err error) {
-	if tgt, e := jsonpath.Get(parent, doc); e != nil {
+func ReplaceValues(parent Cursor, field string, msg json.RawMessage) (ret int, err error) {
+	if cnt, e := parent.Resolve(); e != nil {
 		err = e
-	} else if els, ok := tgt.([]interface{}); !ok {
-		err = errutil.Fmt("unknown target %T", tgt)
 	} else {
-		for _, el := range els {
-			if obj, ok := el.(map[string]interface{}); !ok {
-				err = errutil.Fmt("expected a slice of objects; got %T", el)
+		for i := 0; i < cnt; i++ {
+			if obj, ok := parent.Element(i).(map[string]interface{}); !ok {
+				err = errutil.Fmt("expected a slice of objects; got %T", obj)
 				break
 			} else {
-				if value == nil {
-					delete(obj, field)
-				} else if newVal, e := Clone(value); e != nil {
-					err = e
+				var newVal interface{}
+				if e := json.Unmarshal(msg, &newVal); e != nil {
+					err = errutil.New("couldnt read replacement value because", e)
 					break
 				} else {
 					obj[field] = newVal
+					ret++
 				}
-				ret++
 			}
 		}
 	}
