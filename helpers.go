@@ -21,7 +21,7 @@ type Path string
 
 // Select prepares a collection of elements from a json doc pointed to by the path.
 func (p Path) Select(doc interface{}) Cursor {
-	return Cursor{els: doc, path: string(p), res: nil}
+	return Cursor{els: doc, path: p, res: nil}
 }
 
 // Cursor reads (caches) a collection of objects from a json docs.
@@ -68,7 +68,7 @@ func (c *Cursor) resolve() (ret []interface{}, err error) {
 	case nil:
 		// FIX: this is surely going to break something at some point
 		// Paessler's paths dont handle single quotes by default... but maybe there's a way to make it?
-		path := strings.Replace(c.path, "'", `"`, -1)
+		path := strings.Replace(string(c.path), "'", `"`, -1)
 		if tgt, e := jsonpath.Get(path, c.els); e != nil {
 			err = errutil.New("error selecting", c.path, e)
 			c.res = err
