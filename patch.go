@@ -6,7 +6,7 @@ import (
 	"github.com/ionous/errutil"
 )
 
-// PatchCommand holds a single command for de/serializing a migration.
+// PatchCommand holds a single command for the purpose of de/serializing a migration.
 type PatchCommand struct {
 	Migration // pointer to the command
 }

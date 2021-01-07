@@ -4,7 +4,8 @@ import (
 	"github.com/ionous/errutil"
 )
 
-// ExtractValues targeted by the 'parent' path with the passed 'value'.
+// ExtractValues of the named fields within the objects selected by the passed cursor.
+// If del is true it will remove those elements from the document.
 // ( This is normally used via patch commands. )
 func ExtractValues(from Cursor, field string, del bool) (ret []interface{}, err error) {
 	if cnt, e := from.Resolve(); e != nil {

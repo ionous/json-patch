@@ -15,7 +15,8 @@ type Target struct {
 	Field  string `json:"field"`
 }
 
-// Path is just an indicator of a json path ready string
+// Path provides a JSONPath ready string.
+// See: https://goessner.net/articles/JsonPath/, and https://github.com/PaesslerAG/
 type Path string
 
 // Select prepares a collection of elements from a json doc pointed to by the path.
@@ -24,15 +25,18 @@ func (p Path) Select(doc interface{}) Cursor {
 }
 
 // Cursor reads (caches) a collection of objects from a json docs.
-// FIX: rather than returning []interface{} provide Resolve() and Element(i) which auto-derefs field
-// that will allow transparent handling of nil fields for commands that support that.
 type Cursor struct {
 	res  error       // nil, cached, or error
-	path string      // location of the cursor; for debugging.
+	path Path        // location of the cursor; mainly for debugging.
 	els  interface{} // doc or elements depending
 }
 
 const cached = errutil.Error("github.com/ionous/json-patch/cached")
+
+// Path that describes the collection of objects targeted by the cursor.
+func (c *Cursor) Path() Path {
+	return c.path
+}
 
 // Resolve reads (caches) the objects targeted by a json path and returns the number of matches.
 func (c *Cursor) Resolve() (ret int, err error) {
@@ -44,8 +48,7 @@ func (c *Cursor) Resolve() (ret int, err error) {
 	return
 }
 
-// Element unpacks a value from a targeted object.
-// panics if out of range.
+// Element returns one of the targeted objects.
 func (c *Cursor) Element(i int) (ret interface{}) {
 	if els, e := c.resolve(); e != nil {
 		panic(e)
@@ -55,7 +58,7 @@ func (c *Cursor) Element(i int) (ret interface{}) {
 	return
 }
 
-// Resolve returns a collection of objects originally pointed to by a path.
+// returns a collection of objects originally pointed to by a path.
 func (c *Cursor) resolve() (ret []interface{}, err error) {
 	switch e := c.res; e {
 	default:

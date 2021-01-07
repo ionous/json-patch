@@ -11,33 +11,33 @@ type Migration interface {
 	Migrate(doc interface{}) (int, error)
 }
 
-// Copy replicates pieces of a document.
+// Copy, a Migration, replicates pieces of a document.
 type Copy struct {
 	From Target `json:"from"`
 	To   Target `json:"path"`
 }
 
-// Move relocates pieces of a document.
+// Move, a Migration, relocates pieces of a document.
 type Move struct {
 	From Target `json:"from"`
 	To   Target `json:"path"`
 }
 
-// Patches runs a series of other migrations.
+// Patches, a Migration, runs a series of other migrations.
 type Patches []PatchCommand
 
-// Remove deletes pie	ces of a document.
+// Remove, a Migration, deletes pie	ces of a document.
 type Remove struct {
 	Path Target `json:"path"`
 }
 
-// Replace substitutes new values for pieces of a document.
+// Replace, a Migration, substitutes new values for pieces of a document.
 type Replace struct {
 	Path  Target          `json:"path"`
 	Value json.RawMessage `json:"value"`
 }
 
-// Test validates pieces of a document, then possibly runs sub matches.
+// Test, a Migration, validates pieces of a document, then possibly runs sub matches.
 // Patches are run against the current document, and not specifically things matched by the test.
 // SubPatches are run against all elements matched by the test.
 type Test struct {

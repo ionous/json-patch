@@ -13,7 +13,7 @@ There's no perfect standard for JSON Paths. This uses [PaesslerAG's](https://git
 ## Differences b/t the RFC and this lib.
 
 * JSON Paths affect multiple values; so each operation affects multiple nodes.
-* For ease of implementation this lib defines paths as a pair of values: a `parent path` targeting one or more json objects, plus a `child field` within each matching object. 
+* For ease of implementation, this lib defines paths as a pair of values: a `parent path` targeting one or more json objects, and a `child field` string within each matching object. 
 * RFC compliant error handling hasn't been evaluated. 
 * Array handling hasn't been explored deeply.
 * The operation "add" doesn't exist. ( "replace" basically does the same. )
