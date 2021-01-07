@@ -1,5 +1,6 @@
 # json-patch
 [![Go Reference](https://pkg.go.dev/badge/github.com/ionous/json-patch.svg)](https://pkg.go.dev/github.com/ionous/json-patch)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ionous/json-patch)](https://goreportcard.com/report/github.com/ionous/json-patch)
 
 This is a very modest attempt to bridge the gap between JSON Path and JSON Patch.
 
