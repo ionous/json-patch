@@ -26,6 +26,7 @@ type Move struct {
 // Patches runs a series of other migrations.
 type Patches []PatchCommand
 
+// Remove deletes pie	ces of a document.
 type Remove struct {
 	Path Target `json:"path"`
 }
@@ -83,7 +84,7 @@ func (ps Patches) Migrate(doc interface{}) (ret int, err error) {
 	return
 }
 
-// ApplyOver runs this series of patches over all objects matched by the passed cursor.
+// ApplyOverMatches runs this series of operations over all objects matched by the passed cursor.
 func (ps Patches) ApplyOverMatches(cs Cursor) (ret int, err error) {
 	if cnt, e := cs.Resolve(); e != nil {
 		err = e

@@ -6,7 +6,7 @@ import (
 	"github.com/ionous/errutil"
 )
 
-// CompareValues. fix: untested.
+// CompareValues compares a path against raw json bytes; FIX: it's currently untested.
 // ( This is normally used via patch commands. )
 func CompareValues(from Cursor, field string, value json.RawMessage) (retMatches, retMismatch int, err error) {
 	if cnt, e := from.Resolve(); e != nil {

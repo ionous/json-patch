@@ -34,6 +34,7 @@ type Cursor struct {
 
 const cached = errutil.Error("github.com/ionous/json-patch/cached")
 
+// Resolve reads (caches) the objects targeted by a json path and returns the number of matches.
 func (c *Cursor) Resolve() (ret int, err error) {
 	if els, e := c.resolve(); e != nil {
 		err = e
@@ -44,7 +45,7 @@ func (c *Cursor) Resolve() (ret int, err error) {
 }
 
 // Element unpacks a value from a targeted object.
-// panics if out of range
+// panics if out of range.
 func (c *Cursor) Element(i int) (ret interface{}) {
 	if els, e := c.resolve(); e != nil {
 		panic(e)
