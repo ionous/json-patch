@@ -20,7 +20,9 @@ There's no perfect standard for JSON Paths. This uses [PaesslerAG's](https://git
 * The operation "test" in the RFC requires a value, here it does not. Also, "test" here supports arrays of recursive "patches" and "subpatches", both of which are processed should the test succeed. The "patches" applies its operations to the current document. The "subpatches" applies its operations to each object matched by the test.
 * Defines a "reason" key as a way to add comments to patch files.
 
-While, it's not necessary to have this gracefully decay into the RFC behavior ( ie. so that it can directly support json patch documents ) that would be cool. ( ex. replace the path pair with a single string value; transform json pointers starting with "/" into their "$" path equivalents; directly support all verbs; correctly handle errors; ... )
+While it's not necessary to have this gracefully decay into the RFC behavior ( ie. so that it can directly support json patch documents ) that would be cool. ( ex. replace the path pair with a single string value; transform json pointers starting with "/" into their "$" path equivalents; directly support all verbs; correctly handle errors; ... )  
+
+It also might be nice to merge the 'test' op's "patches" and "subpatches". Each path could itself could indicate the desired matching behavior. For instance, paths starting with the standard `$` could match against the current document, while `@` could match against the object matched by the test.
 
 ## Sample Patch
 
