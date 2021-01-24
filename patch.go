@@ -28,6 +28,7 @@ func (c *PatchCommand) UnmarshalJSON(data []byte) (err error) {
 }
 
 var opFactory = map[string]func() Migration{
+	"add":     func() Migration { return new(Replace) },
 	"copy":    func() Migration { return new(Copy) },
 	"move":    func() Migration { return new(Move) },
 	"remove":  func() Migration { return new(Remove) },
