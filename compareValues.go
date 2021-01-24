@@ -14,7 +14,7 @@ func CompareValues(from Cursor, field string, value json.RawMessage) (retMatches
 	} else {
 		for i := 0; i < cnt; i++ {
 			el := from.Element(i)
-			if got, e := json.Marshal(el); e != nil {
+			if got, e := marshal(el); e != nil {
 				err = errutil.New("compare error compacting el", e)
 			} else {
 				same := len(got) == len(value) // provisionally
