@@ -11,7 +11,6 @@ import (
 
 	"github.com/ionous/errutil"
 	jp "github.com/ionous/json-patch"
-	jsonpatch "github.com/ionous/json-patch"
 )
 
 func main() {
@@ -56,7 +55,7 @@ func migratePaths(paths, outdir string, patch jp.Migration) (err error) {
 		} else {
 			defer f.Close()
 			js := json.NewEncoder(f)
-			js.SetEscapeHTML(jsonpatch.EscapeHTML)
+			js.SetEscapeHTML(jp.EscapeHTML)
 			js.SetIndent("", "  ")
 			if e := js.Encode(doc); e != nil {
 				err = errutil.New("couldnt encode output", e)
