@@ -26,7 +26,7 @@ type Move struct {
 // Patches, a Migration, runs a series of other migrations.
 type Patches []PatchCommand
 
-// Remove, a Migration, deletes pie	ces of a document.
+// Remove, a Migration, deletes pieces of a document.
 type Remove struct {
 	Path Target `json:"path"`
 }
@@ -120,7 +120,9 @@ func (op *Replace) Migrate(doc interface{}) (ret int, err error) {
 
 // Migrate runs the test command; potentially recursive.
 func (op *Test) Migrate(doc interface{}) (ret int, err error) {
-	from := op.Path.Parent.Select(doc)
+	from := op.Path.FullPath.Select(doc)
+	// rfc json patch looks at the values at a path for perfect equality
+	// this allow values to be empty, and introduces recursive descent data ( below )
 	if len(op.Value) > 0 {
 		if matches, misses, e := CompareValues(from, op.Path.Field, op.Value); e != nil {
 			err = e
@@ -130,8 +132,6 @@ func (op *Test) Migrate(doc interface{}) (ret int, err error) {
 			ret += matches
 		}
 	}
-
-	// fix: should handle field not being null
 	if ps := op.Patches; err == nil && ps != nil {
 		cnt, e := from.Resolve()
 		if e != nil {

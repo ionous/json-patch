@@ -1,6 +1,8 @@
 package jsonpatch
 
 import (
+	"encoding/json"
+	"regexp"
 	"strings"
 
 	"github.com/PaesslerAG/jsonpath"
@@ -11,13 +13,64 @@ import (
 // with a json path pointing to (one or more) objects,
 // and a field addressing a member of each objects.
 type Target struct {
-	Parent Path   `json:"parent"`
-	Field  string `json:"field"`
+	Parent   Path   `json:"parent"`
+	Field    string `json:"field"`
+	FullPath Path   // original path, the join of parent and field.
+}
+
+// https://regoio.herokuapp.com/
+var parts = regexp.MustCompile(`(\[.+?\]|\.[^\[.]*)`)
+var pieces = regexp.MustCompile(`^\.(\w+)$|^\['(.*)'\]$`)
+
+// / UnmarshalJSON creates concrete implementations of migrations.
+func (c *Target) UnmarshalJSON(data []byte) (err error) {
+	// we have to read the name before we can know how to read the particular command.
+	var val interface{}
+	if e := json.Unmarshal(data, &val); e != nil {
+		err = errutil.New("couldnt unmarshal patch command", e)
+	} else {
+		switch path := val.(type) {
+		default:
+			err = errutil.New("unknown path", val)
+		case string:
+			// split the strings into parts ( either dotted fields, or bracketed ones )
+			var field string
+			parts := parts.FindAllString(path, -1)
+			ogpath := path
+			if end := len(parts) - 1; end >= 0 {
+				pieces := pieces.FindStringSubmatch(parts[end])
+				if len(pieces) == 3 {
+					// rejoin all the front parts together
+					path = "$" + strings.Join(parts[:end], "")
+					// except for the last piece sans any leading dot.
+					if unbracketed := pieces[2]; len(unbracketed) > 0 {
+						field = unbracketed
+					} else if undotted := pieces[1]; len(undotted) > 0 {
+						field = undotted
+					} else {
+						panic("impossible?")
+					}
+				}
+			}
+			c.FullPath, c.Parent, c.Field = Path(ogpath), Path(path), field
+
+		case map[string]interface{}:
+			if p, ok := path["parent"].(string); !ok {
+				err = errutil.New("couldnt find parent in", path)
+			} else {
+				f, _ := path["field"].(string) // its okay for some ops if the field is missing
+				*c = At(p, f)
+			}
+		}
+	}
+	return
 }
 
 // Path provides a JSONPath ready string.
 // See: https://goessner.net/articles/JsonPath/, and https://github.com/PaesslerAG/
 type Path string
+
+func (p Path) String() string { return string(p) }
 
 // Select prepares a collection of elements from a json doc pointed to by the path.
 func (p Path) Select(doc interface{}) Cursor {
@@ -70,7 +123,11 @@ func (c *Cursor) resolve() (ret []interface{}, err error) {
 		// Paessler's paths dont handle single quotes by default... but maybe there's a way to make it?
 		path := strings.Replace(string(c.path), "'", `"`, -1)
 		if tgt, e := jsonpath.Get(path, c.els); e != nil {
-			err = errutil.New("error selecting", c.path, e)
+			if estr := e.Error(); strings.Contains(estr, "unknown key") {
+				err = UnknownKey{estr, c.path.String()}
+			} else {
+				err = errutil.New("error selecting", c.path, e)
+			}
 			c.res = err
 		} else {
 			els, ok := tgt.([]interface{})
