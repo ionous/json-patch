@@ -22,7 +22,7 @@ type Target struct {
 var parts = regexp.MustCompile(`(\[.+?\]|\.[^\[.]*)`)
 var pieces = regexp.MustCompile(`^\.(\w+)$|^\['(.*)'\]$`)
 
-// / UnmarshalJSON creates concrete implementations of migrations.
+// UnmarshalJSON creates concrete implementations of migrations.
 func (c *Target) UnmarshalJSON(data []byte) (err error) {
 	// we have to read the name before we can know how to read the particular command.
 	var val interface{}

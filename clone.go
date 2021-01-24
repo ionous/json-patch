@@ -31,6 +31,6 @@ func marshal(doc interface{}) (ret []byte, err error) {
 	return
 }
 
-// EscapeHTML: replace &, >, and < with unicode sequences when copying / comparing strings?
+// EscapeHTML - replace &, >, and < with unicode sequences when copying / comparing strings?
 // ( default for jsonpatch is not )
 var EscapeHTML = false

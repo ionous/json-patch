@@ -19,9 +19,9 @@ func At(parent, field string) Target {
 	return Target{Path(parent), field, full}
 }
 
-// Json turns a string into json data ( for writing patches in go. )
+// Jstr turns a string into json data ( for writing patches in go. )
 // FIX: restore the example.
-func Json(s string) (ret interface{}) {
+func Jstr(s string) (ret interface{}) {
 	var data interface{}
 	if e := json.Unmarshal([]byte(s), &data); e != nil {
 		ret = errutil.New("error reading json data", e)
